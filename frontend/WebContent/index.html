@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>AutoCar</title>
+
+<script src="js/jquery-2.1.1.js"></script>
+<script type="text/javascript" src="js/bootstrap.js"></script>
+<script src="js/angular.js"></script>
+<script src="js/angular-resource.js"></script>
+<script src="js/angular-route.js"></script>
+<script src="js/cities.js"></script>
+
+<link rel="stylesheet" href="css/bootstrap.css">
+<link rel="stylesheet" href="css/bootstrap-theme.css">
+<link rel="stylesheet" href="css/StyleHome.css">
+<link rel="stylesheet" href="css/Picture.css">
+<link
+	href='http://fonts.googleapis.com/css?family=Lobster&subset=latin,latin-ext'
+	rel='stylesheet' type='text/css'>
+</head>
+
+<div ng-app="myApp">
+	<header>
+		<div class="row" id="header">
+			<div class="col-md-2">
+				<img src="img/voiture.jpg" alt="voiture" height="100" width="100" />
+			</div>
+			<div class="col-md-6">
+				<h1 id="titleHeader">
+					<a href="index.html">Tous en voiture !</a>
+				</h1>
+			</div>
+			<div class="col-md-4">
+				<form ng-hide="show" ng-submit="auth()" id="form-auth"
+					role="form-auth" class="form-inline">
+					<div class="form-group">
+						<div class="input-group">
+							<span class="input-group-addon"> <span
+								class="glyphicon glyphicon-user"></span></span> <input
+								ng-model="usernameAuth" class="form-control"
+								placeholder="Entrer login" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="sr-only" for="exampleInputPassword2">Mot de
+							passe</label> <input ng-model="passwordAuth" type="password"
+							class="form-control" placeholder="Password" />
+					</div>
+					<button type="submit" class="btn btn-success">Se Connecter</button>
+					<button type="button" class="btn btn-primary" data-toggle="modal"
+						data-target="#myModal">S'enregistrer</button>
+				</form>
+			</div>
+		</div>
+	</header>
+
+	<body>
+		<section ng-controller="Cities">
+
+			<!-- Modal -->
+			<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+				aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal"
+								aria-label="Close">
+								<span aria-hidden="true">&times;</span>
+							</button>
+							<h4 class="modal-title" id="myModalLabel">S'enregistrer</h4>
+						</div>
+						<div class="modal-body">
+							<form ng-submit="auth()" id="form-auth" role="form-auth"
+								class="form-inline">
+								<div class="form-group">
+									<div class="input-group">
+										<span class="input-group-addon"> <span
+											class="glyphicon glyphicon-user"></span></span> <input
+											ng-model="usernameReg" class="form-control"
+											placeholder="Entrer login" />
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="input-group">
+										<span class="input-group-addon"> <span
+											class="glyphicon glyphicon-lock"></span></span><input
+											ng-model="passwordReg" type="password" class="form-control"
+											placeholder="Password" />
+									</div>
+								</div>
+							</form>
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-default"
+								data-dismiss="modal">Fermer</button>
+							<button ng-click="register()" type="button"
+								class="btn btn-primary" data-dismiss="modal">Confirmer</button>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Villes ------>
+			<div ng-repeat="city in cities" class="col-md-3">
+				<center>
+					<div class="cuadro_intro_hover">
+						<img src="img/{{city.name}}.jpg" class="img-responsive" alt="">
+						<div class="caption">
+							<div class="blur"></div>
+							<div class="caption-text">
+								<h3
+									style="border-top: 2px solid white; border-bottom: 2px solid white; padding: 10px;">{{city.name}}</h3>
+								<p>Vous trouverez ci dessous la liste des trajets partant de
+									cette ville.</p>
+								<button ng-click="sTrip(city._id)" class=" btn btn-default">
+									<span class="glyphicon glyphicon-road"> Trajets</span></a>
+							</div>
+						</div>
+					</div>
+				</center>
+			</div>
+			<div class="table-responsive col-md-12">
+				<table class="table">
+					<thead>
+						<tr>
+							<th>Nom</th>
+							<th>Départ</th>
+							<th>Arrivée</th>
+							<th>Places</th>
+							<th>Date</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="trip in trips">
+							<td>{{trip.trip_owner[0].name}}</td>
+							<td>{{trip.trip_start[0].name}}</td>
+							<td>{{trip.trip_end[0].name}}</td>
+							<td>{{trip.nb}}/{{trip.nb_max}}</td>
+							<td>{{trip.trip_date}}</td>
+							<td><button ng-click="joinTrip(trip._id)" type="submit"
+									class="btn btn-primary">Réserver</button></td>
+						</tr>
+					</tbody>
+				</table>
+				<form class="form-inline">
+					<div class="form-group">
+						<label class="sr-only" for="exampleInputEmail3">Prénom</label> <input
+							class="form-control" id="exampleInputEmail3" placeholder="Prénom"
+							ng-model="ownerName">
+					</div>
+					<div class="form-group">
+						<label class="sr-only" for="exampleInputEmail3">Départ</label> <input
+							class="form-control" id="exampleInputEmail3" placeholder="Départ"
+							ng-model="cityStartName">
+					</div>
+					<div class="form-group">
+						<label class="sr-only" for="exampleInputPassword3">Arrivée</label>
+						<input class="form-control" id="exampleInputEmail3"
+							placeholder="Arrivée" ng-model="cityEndName">
+					</div>
+					<div class="form-group">
+						<label class="sr-only" for="exampleInputPassword3">Nb
+							Places</label> <input class="form-control" id="exampleInputEmail3"
+							placeholder="Nb Places" ng-model="nbSpots">
+					</div>
+					<div class="form-group">
+						<label class="sr-only" for="exampleInputPassword3">Date
+							Trip</label> <input class="form-control" id="exampleInputEmail3"
+							placeholder="yyyy/mm/dd hh:mm" ng-model="dateTrip">
+					</div>
+					<button ng-click="createTrip()" type="submit"
+						class="btn btn-success">Créer Trajet</button>
+				</form>
+			</div>
+		</section>
+	</body>
+
+</div>
+</html>

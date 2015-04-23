@@ -1,0 +1,47 @@
+#global {
+	position: relative;
+	width: 100%;
+	margin: auto;
+	background-color: #c0c0c0;
+}
+
+#header {
+	background-color: #FFFFFF;
+	border-bottom-width: 6px;
+	box-shadow: 0 6px 4px -2px gray;
+}
+
+#form-auth {
+	position: relative;
+	padding-top: 10px;
+}
+
+#titleHeader {
+	text-shadow: 2px 5px 2px #25;
+	font-size: 70px;
+	color: #0080c0;
+	font-family: 'Lobster', cursive;
+}
+
+.custom_btn {
+	border-color: #00ff00;
+	background-color: #00ff00;
+}
+
+.custom_btn:hover {
+	border-color: #ffb300;
+	background-color: #ffb300;
+}
+
+section {
+	border-bottom-width: 6px;
+	border-bottom-width: 30px;
+	display: block;
+	padding-top: 20px;
+	padding-bottom: 20px;
+}
+
+body {
+	color: #888;
+	background-color: #c0c0c0;
+}
