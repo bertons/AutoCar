@@ -11,10 +11,7 @@ db.once('open', function (callback) {
 	console.log("DB");
 });
 
-console.log("init");
 app.use(bodyParser());
-//app.use(methodOverride());
-
 
 app.all("*", function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
@@ -34,13 +31,9 @@ app.use(session({
 }));
 
 app.use(function(req, res, next) {
-console.log('app.use(function(req, res, next)');
-console.log(req.session);
-console.log(req.session.user);
   if (req.session && req.session.user) {
     User.findOne({ name: req.session.user.name }, function(err, user) {
       if (user) {
-	  	console.log("user exist");
         req.user = user;
         delete req.user.password;
         req.session.user = user;
@@ -53,45 +46,13 @@ console.log(req.session.user);
   }
 });
 
-function requireLogin (req, res, next) {
-	console.log('requireLogin()');
-	next();
-	//console.log(req.user);
-/*  if (err || !req.user) {
-  console.log('redirect');
-    res.redirect('/authenticate.html');
-	//res.writeHead(302, { 'Location':'authenticate.html'});
-    res.end();
-  } else {
-    next();
-  }
-*/
-};
-
-/*
-app.use(function(req, res, next) {
-  if (req.mySession.seenyou) {
-    res.setHeader('X-Seen-You', 'true');
-  } else {
-    // setting a property will automatically cause a Set-Cookie response
-    // to be sent
-    req.mySession.seenyou = true;
-    res.setHeader('X-Seen-You', 'false');
-  }
-});
-*/
-console.log("app.configure");
-
 var CitySchema = mongoose.Schema({
 	name: String,
 });
 var City = mongoose.model('CITY', CitySchema, 'CITY');
 
 app.get('/cities', function (req, res) {
-	console.log("app.get /cities");
-	//requireLogin();
 	City.find({}, function(err, cities) {
-		
 		if( err || !cities) console.log("No cities found");
 		  else 
 		{
@@ -105,7 +66,6 @@ app.get('/cities', function (req, res) {
 			str = str.trim();
 			str = str.substring(0,str.length-1);
 			str = str + ']';
-			//console.log(str);
 			res.end(str);
 		}
 	});
@@ -118,19 +78,12 @@ var UserSchema = mongoose.Schema({
 var User = mongoose.model('USER', UserSchema, 'USER');
 
  app.post('/login', function(req, res) {
-	console.log("app.post /login");
-	console.log(req.body);
-	console.log(req.body.mydata);
 	var jsonData = JSON.parse(req.body.mydata);
 	User.findOne({ name: jsonData.username }, function(err, user) {
-		console.log(user);
 		if (!user) {
-			console.log('no login');
 			res.end('no login', { error: 'Invalid name or password.' });
 		} else {
 			if (jsonData.password == user.pwd) {
-				console.log('login');
-				// sets a cookie with the user's info
 				req.session.user = user;
 				res.end('login');
 			} else {
@@ -143,21 +96,13 @@ var User = mongoose.model('USER', UserSchema, 'USER');
 app.get('/index', function(req, res) {
 	requireLogin();
 	console.log("app.post /index");
-	if (req.session && req.session.user) { // Check if session exists
-    // lookup the user in the DB by pulling their name from the session
+	if (req.session && req.session.user) {
     User.findOne({ name: req.session.user.name }, function (err, user) {
       if (!user) {
-        // if the user isn't found in the DB, reset the session info and
-        // redirect the user to the login page
-		console.log("user no exist");
         req.session.reset();
         res.end('/login');
       } else {
-        // expose the user to the template
-
         res.locals.user = user;
-
-        // render the index page
         res.render('index.jade');
       }
     });
@@ -167,14 +112,11 @@ app.get('/index', function(req, res) {
 });
 
 app.get('/logout', function(req, res) {
-	console.log("app.post /logout");
 	req.session.reset();
 	res.end('/logout');
 });
 
 app.post('/register', function (req, res) {
-	console.log("app.post /register");
-	console.log(req.body.mydata);
 	var jsonData = JSON.parse(req.body.mydata);
     var newuser = new User();
 
@@ -185,7 +127,6 @@ app.post('/register', function (req, res) {
         if(err){ throw err; }
         console.log('saved');
     })
-
     res.send('user saved');
 });
 
@@ -203,8 +144,6 @@ var tripSchema = mongoose.Schema({
 var Trip = mongoose.model('TRIP', tripSchema, 'TRIP');
 
 app.get('/searchtrip', function (req, res) {
-	console.log("app.get /searchtrip");
-	console.log(req.query);
 	Trip.find({'trip_start': req.query.city})
 	.populate('trip_owner', 'name')
 	.populate('trip_start')
@@ -217,8 +156,6 @@ app.get('/searchtrip', function (req, res) {
 			res.writeHead(200, {'Content-Type': 'application/json'});
 			str='[';
 			trips.forEach( function(trip) {
-			//str = str + JSON.stringify(trip) + '\n';
-			
 				str = str + '{"trip_owner":'+ JSON.stringify(trip.trip_owner);
 				str = str + ',"trip_start":'+ JSON.stringify(trip.trip_start);
 				str = str + ',"trip_end":'+ JSON.stringify(trip.trip_end);
@@ -227,20 +164,16 @@ app.get('/searchtrip', function (req, res) {
 				str = str + '","nb_max":"' + trip.nb_max;
 				str = str + '","_id":"' + trip._id;
 				str = str + '"},';
-			
 			});
 			str = str.trim();
 			str = str.substring(0,str.length-1);
 			str = str + ']';
-			console.log(str);
 			res.end(str);
 		}
 	});
 });
 
 app.post('/createtrip', function (req, res) {
-	console.log("app.get /createtrip");
-	console.log(req.body.mydata);
 	var data = JSON.parse(req.body.mydata);
     newTrip = new Trip();
 
@@ -253,7 +186,6 @@ app.post('/createtrip', function (req, res) {
 	
 	newTrip.save(function(err){
         if(err){ throw err; }
-        console.log('saved');
     })
 	res.send('Trip saved');
 });
@@ -265,9 +197,6 @@ var teamTripSchema = mongoose.Schema({
 var TeamTrip = mongoose.model('TEAMTRIP', tripSchema, 'TEAMTRIP');
 
 app.post('/jointrip', requireLogin, function (req, res) {
-	console.log("app.get /jointrip");
-	//var data = req.body.mydata,
-	console.log(req.body.mydata);
 	var jsonData = JSON.parse(req.body.mydata);
     newTeamTrip = new TeamTrip();
 
@@ -276,23 +205,16 @@ app.post('/jointrip', requireLogin, function (req, res) {
 	
 	newTeamTrip.save(function(err){
         if(err){ throw err; }
-        console.log('saved');
     })
-	
-	//Trip.update({_id:jsonData.tripid}, {$inc:{nb:1}});
-	//Trip.findOne({_id:jsonData.tripid}, function(err, doc){
 	Trip.findById(jsonData.tripid)
 	.$where('this.nb < this.nb_max')
 	.exec(function(err, doc){
 		if (err || !doc)
-			console.log("No trips found");
 		else {
 			doc.nb = parseInt(doc.nb) + 1;
 			doc.save();
-			console.log("success : nb pa inc");
 		}
 	});
-	
 	res.send('TeamTrip saved');
 });
 
